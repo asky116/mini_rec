@@ -9,6 +9,14 @@ class Settings:
     embed_mode = 'vector'
     embed_size = 8
 
+    # deep_layers
+    units = [256,128,64]
+    # cross_layer_numb
+    layer_num = 6
+
+    # deep layers activation
+    act = 'sigmoid'
+
     # optimizer
     opt = keras.optimizers.Adam()
 

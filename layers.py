@@ -5,13 +5,19 @@ import tensorflow as tf
 from tensorflow import keras
 
 class FMLayer(keras.layers.Layer):
+    """
+    FM模型的特征交叉层
+    imput_shape: (batch, feature_num, embed_size)
+    """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         
     def call(self, inputs):
-        # Inputs shape: (None, feature_num, embedding_size)
+        # 和的平方
         sum_square = tf.square( tf.reduce_sum(inputs, axis=1))
+        # 平方的和
         square_sum = tf.reduce_sum( tf.square(inputs), axis=1)
+        # output_shape: ( batch, 1)
         output = 0.5 * tf.reduce_sum(sum_square-square_sum, axis=1, keepdims=True)
         return output
 
@@ -30,32 +36,36 @@ class FFMLayer(keras.layers.Layer):
         return tf.reduce_sum(res, axis=-1, keepdims=True)
 
 class Cross_Layer(keras.layers.Layer):
+    """
+    Deep&Cross模型中的 Cross 层
+    """
     def __init__(self, layer_num, reg, **kwargs):
         super().__init__(**kwargs)
+        # layer_num: cross模块的层数
         self.layer_num = layer_num
         self.reg = reg
 
     def build(self, input_shape):
+        # 矩阵形式存储权重
         self.cross_weight = self.add_weight(
             shape=(self.layer_num, input_shape[1]),
             initializer='random_normal',
             regularizer=self.reg,
-            trainable=True
-        )
-
+            trainable=True)
+        # 矩阵形式存储偏移
         self.bias_weight = self.add_weight(
             shape=(self.layer_num, input_shape[1]),
             initializer='random_normal',
             regularizer=self.reg,
-            trainable=True
-        )
+            trainable=True)
 
     def call(self, inputs):
         x0 = inputs
         xi = x0
         for i in tf.range(self.layer_num):
+            # x_j = x_0 * ( x_i * w_j) + b_j + x_i
             temp = tf.reduce_sum((xi*self.cross_weight[i]), keepdims=True)
-            xi = x0*temp + self.cross_weight[i] + xi
+            xi = x0*temp + self.bias_weight[i] + xi
 
         return xi
 
