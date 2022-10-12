@@ -38,6 +38,7 @@ class FFMLayer(keras.layers.Layer):
 class Cross_Layer(keras.layers.Layer):
     """
     Deep&Cross模型中的 Cross 层
+    由于cross_network模块没有激活函数, 因此为避免输出出现无穷大的情况, 输入数据应该先进行scaler
     """
     def __init__(self, layer_num, reg, **kwargs):
         super().__init__(**kwargs)
@@ -55,7 +56,7 @@ class Cross_Layer(keras.layers.Layer):
         # 矩阵形式存储偏移
         self.bias_weight = self.add_weight(
             shape=(self.layer_num, input_shape[1]),
-            initializer='random_normal',
+            initializer='zeros',
             regularizer=self.reg,
             trainable=True)
 

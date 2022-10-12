@@ -13,9 +13,13 @@ class Settings:
     units = [256,128,64]
     # cross_layer_numb
     layer_num = 6
+    # cin_size
+    cin_size = [ 32, 32, 32]
+    # PNN_MODE
+    PNN_MODE = 'both'
 
     # deep layers activation
-    act = 'sigmoid'
+    act = 'relu'
 
     # optimizer
     opt = keras.optimizers.Adam()
